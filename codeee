@@ -1,0 +1,83 @@
+// For this week's assignment, I made use of random circles that goes big and shrinks to make is appear as if it is keeping up to the music "Unpredictable" by Ayumu Imazu.
+
+
+
+let music;
+let circles = [];
+let bgColor;
+let lastBgChangeTime = 0;
+let bgChangeInterval = 10000;// this is to change the background color every 10 seconds
+
+function setup() {
+  createCanvas(800, 400);
+  frameRate(70); // I increase the frame rate for faster changes in the circle to match the music beats
+
+  // I gave a random() for background color togenerate ramdom colors
+  bgColor = color(random(255), random(255), random(255));
+
+  // this loop is to create circles with random positions and sizes
+  for (let i = 0; i < 10; i++) {
+    let x = random(width);
+    let y = random(height);
+    let radius = random(20, 100);
+    let speed = random(2, 5);
+    let fillColor = color(random(255), random(255), random(255), 150);
+
+    circles.push(new Circle(x, y, radius, speed, fillColor));
+  }
+}
+
+function preload(){
+  music = loadSound("Media/Unpredictable.m4a", loaded);
+}
+
+function loaded() {
+  music.play();
+}
+
+function draw() {
+  background(bgColor);
+
+  for (let circle of circles) {
+    circle.update();
+    circle.display();
+  }
+
+  // This is to check if it's time to change the background color
+  if (millis() - lastBgChangeTime > bgChangeInterval) {
+    bgColor = color(random(255), random(255), random(255));
+    lastBgChangeTime = millis();
+  }
+}
+
+class Circle {
+  constructor(x, y, radius, speed, fillColor) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.speed = speed;
+    this.fillColor = fillColor;
+    this.growing = true;
+  }
+
+  update() {
+    // Change circle size and color
+    if (this.growing) {
+      this.radius += this.speed;
+    } else {
+      this.radius -= this.speed;
+    }
+
+    // Since I don't want it to grow too big or too small, I wrote this condition to reverse the size when it gets to that threshold limit
+    if (this.radius > 100 || this.radius < 20) {
+      this.growing = !this.growing;
+    }
+  }
+
+  display() {
+    // CIRCLE
+    noStroke();
+    fill(this.fillColor);
+    ellipse(this.x, this.y, this.radius * 2);
+  }
+}
